@@ -1,3 +1,8 @@
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
 # ***** BEGIN LICENSE BLOCK *****
 # Version: MPL 1.1/GPL 2.0/LGPL 2.1
 #
@@ -414,11 +419,11 @@ if __name__ == "__main__":
         t1 = time.time()
         tree = HTML(data, ReParser)
         t2 = time.time()
-        print "RE parsing took %s" % (t2-t1)
+        print("RE parsing took %s" % (t2-t1))
         t1 = time.time()
         tree = HTML(data, SgmlopParser)
         t2 = time.time()
-        print "sgmlop parsing took %s" % (t2-t1)
+        print("sgmlop parsing took %s" % (t2-t1))
         sys.exit(0)
 
     data = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -433,7 +438,7 @@ if __name__ == "__main__":
 </body>
 </html>"""
     tree = HTML(data)
-    print ElementTree.tostring(tree)
+    print(ElementTree.tostring(tree))
     sys.exit(0)
 
     data = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -442,7 +447,7 @@ if __name__ == "__main__":
 <head>
 """
     tree = HTML(data)
-    print ElementTree.tostring(tree)
+    print(ElementTree.tostring(tree))
     sys.exit(0)
 
     data = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -651,7 +656,7 @@ function fadeTableRow(rowid, opts) {
 
 """
     tree = HTML(data)
-    print ElementTree.tostring(tree)
+    print(ElementTree.tostring(tree))
     p = Parser(HTMLTreeBuilder())
     p.feed(data)
     p.close()

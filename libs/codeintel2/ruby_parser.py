@@ -38,6 +38,7 @@
 #   Eric Promislow (EricP@ActiveState.com)
 
 """Ruby parsing support for codeintel/rubycile.py"""
+from __future__ import print_function
 
 import string
 import sys
@@ -57,6 +58,8 @@ from codeintel2.parser_data import VAR_KIND_UNKNOWN, VAR_KIND_GLOBAL, \
     VAR_KIND_ALIAS
 
 import logging
+from six.moves import map
+from six.moves import zip
 log = logging.getLogger("ruby_parser")
 # log.setLevel(logging.DEBUG)
 
@@ -1330,5 +1333,5 @@ if __name__ == "__main__":
     tokenizer = ruby_lexer.RubyLexer(sample_code)
     parser = Parser(tokenizer, "Ruby")
     tree = parser.parse()
-    print "Analyze the parse tree"
+    print("Analyze the parse tree")
     tree.dump()

@@ -73,6 +73,7 @@
 
     The command-line interface will return non-zero iff the scan failed.
 """
+from __future__ import print_function
 
 import os
 from os.path import abspath, basename, dirname, splitext, isfile, isdir, join
@@ -326,7 +327,7 @@ def main(argv):
         opts, args = getopt.getopt(argv[1:], "Vvhf:cL:",
                                    ["version", "verbose", "help", "filename=", "md5=", "mtime=",
                                     "clock", "language="])
-    except getopt.GetoptError, ex:
+    except getopt.GetoptError as ex:
         log.error(str(ex))
         log.error("Try `rubycile --help'.")
         return 1
@@ -342,7 +343,7 @@ def main(argv):
             return
         elif opt in ("-V", "--version"):
             ver = '.'.join([str(part) for part in _version_])
-            print "rubycile %s" % ver
+            print("rubycile %s" % ver)
             return
         elif opt in ("-v", "--verbose"):
             numVerboses += 1
@@ -413,7 +414,7 @@ def main(argv):
     if 0:  # except Exception, ex:
         log.error(str(ex))
         if log.isEnabledFor(logging.DEBUG):
-            print
+            print()
             import traceback
             traceback.print_exception(*sys.exc_info())
         return 1

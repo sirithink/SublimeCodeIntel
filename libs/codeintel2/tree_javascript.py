@@ -36,6 +36,7 @@
 # ***** END LICENSE BLOCK *****
 
 """Completion evaluation code for JavaScript"""
+from __future__ import print_function
 
 import types
 import re
@@ -214,7 +215,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
         # javascript/cpln/ctor_scope_cheat for an example of why.
         try:
             elem = self._elem_from_scoperef(scoperef)
-        except KeyError, ex:
+        except KeyError as ex:
             self.warn("_hit_from_first_token:: no elem for scoperef: %r",
                       scoperef)
             return (None, None)
@@ -234,7 +235,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
         while 1:
             try:
                 elem = self._elem_from_scoperef(scoperef)
-            except KeyError, ex:
+            except KeyError as ex:
                 raise EvalError("could not resolve scoperef %r: %s"
                                 % (scoperef, ex))
             try:
@@ -427,13 +428,13 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                     if token == "()":
                         try:
                             new_hits += self._hits_from_call(elem, scoperef)
-                        except CodeIntelError, ex:
+                        except CodeIntelError as ex:
                             self.warn("could resolve call on %r: %s", elem, ex)
                     else:
                         try:
                             new_hit = self._hit_from_getattr(
                                 elem, scoperef, token)
-                        except CodeIntelError, ex:
+                        except CodeIntelError as ex:
                             self.warn(str(ex))
                         else:
                             new_hits.append(new_hit)
@@ -466,7 +467,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                         else:
                             subhits = self._hits_from_variable_type_inference(
                                 elem, scoperef)
-                    except CodeIntelError, ex:
+                    except CodeIntelError as ex:
                         self.warn("could not resolve %r: %s", elem, ex)
                     else:
                         resolved_hits += subhits
@@ -700,7 +701,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                      " expression found, trying alternatives.")
             try:
                 parent_elem = self._elem_from_scoperef(scoperef)
-            except KeyError, ex:
+            except KeyError as ex:
                 raise CodeIntelError(
                     "could not resolve recursive citdl expression %r" % citdl)
             else:
@@ -945,7 +946,7 @@ from ciElementTree import Element, SubElement, dump
 if _xpcom_:
     from xpcom import xpt
     _xpcom_ = True
-    from gencix_utils import *
+    from .gencix_utils import *
 
     # Dictionary of known xpcom types and what they map to in JavaScript
     javascript_type_from_xpt_tag = {
@@ -1011,7 +1012,7 @@ if _xpcom_:
         try:
             interface = xpt.Interface(iid)
         except:
-            print "No interface with iid: %r" % (iid, )
+            print("No interface with iid: %r" % (iid, ))
         else:
             # Filter out non-xpcom methods
             methods = [m for m in interface.methods if not m.IsNotXPCOM()]

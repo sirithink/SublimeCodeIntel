@@ -6,7 +6,7 @@
 # (BSD-style).
 
 import re
-from Base import Base
+from .Base import Base
 
 
 class English (Base):

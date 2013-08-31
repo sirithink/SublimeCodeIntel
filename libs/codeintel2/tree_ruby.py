@@ -43,6 +43,7 @@ from codeintel2.common import *
 from codeintel2.tree import TreeEvaluator
 from codeintel2.tree_javascript import JavaScriptTreeEvaluator
 from codeintel2.database.stdlib import StdLib
+from functools import reduce
 
 # Evaluator
 #   CitadelEvaluator
@@ -412,7 +413,7 @@ class RubyTreeEvaluator(TreeEvaluatorHelper):
                                                             (sc2_hit[0], []))
                                 scoperefs += new_scoperefs
 
-            except AttributeError, ex:
+            except AttributeError as ex:
                 self.debug("_calc_base_scoperefs: %s", ex)
                 pass
 
@@ -654,7 +655,7 @@ class RubyTreeEvaluator(TreeEvaluatorHelper):
                                 self.debug(
                                     "Not adding from %s: member_type=%s or not fabricated", imported_name, member_type)
                                 pass
-                        except CodeIntelError, ex:
+                        except CodeIntelError as ex:
                             self.warn(
                                 "_members_from_elem: %s (can't look up member %r in blob %r)", ex, imported_name, blob)
 
@@ -993,7 +994,7 @@ class RubyTreeEvaluator(TreeEvaluatorHelper):
             blob = import_handler.import_blob_name(
                 module_name, self.libs, self.ctlr)
             return blob
-        except CodeIntelError, ex:
+        except CodeIntelError as ex:
             # Continue looking
             self.warn("_get_imported_blob(2): %s", str(ex))
 

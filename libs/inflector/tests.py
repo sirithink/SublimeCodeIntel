@@ -4,7 +4,7 @@
 # Copyright (c) 2006 Bermi Ferrer Martinez
 
 import unittest
-from Inflector import Inflector, English, Spanish
+from .Inflector import Inflector, English, Spanish
 
 
 class EnglishInflectorTestCase(unittest.TestCase):

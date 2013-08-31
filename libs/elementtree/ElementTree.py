@@ -109,6 +109,7 @@ __all__ = [
 import string
 import sys
 import re
+import six
 
 
 class _SimpleElementPath:
@@ -135,7 +136,7 @@ class _SimpleElementPath:
         return result
 
 try:
-    import ElementPath
+    from . import ElementPath
 except ImportError:
     # FIXME: issue warning in this case?
     ElementPath = _SimpleElementPath()
@@ -982,7 +983,7 @@ class iterparse:
             return self
     except NameError:
         def __getitem__(self, index):
-            return self.next()
+            return six.advance_iterator(self)
 
 ##
 # Parses an XML document from a string constant.  This function can

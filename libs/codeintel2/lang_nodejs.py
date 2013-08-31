@@ -48,6 +48,8 @@ from codeintel2.lang_javascript import (JavaScriptLexer,
                                         JavaScriptImportHandler,
                                         JavaScriptCILEDriver)
 from codeintel2.tree_javascript import JavaScriptTreeEvaluator
+from six.moves import map
+from six.moves import zip
 
 #---- globals
 
@@ -179,7 +181,7 @@ class NodeJSTreeEvaluator(JavaScriptTreeEvaluator):
                         self.log("found module via %r, trying %r",
                                  manifest_path, main_path)
                         hits = load_as_file(main_path)
-                except ValueError, e:
+                except ValueError as e:
                     self.log("Error loading %r: %r", manifest_path, e)
                 finally:
                     manifest_file.close()

@@ -18,10 +18,13 @@ the Top-Down approach:
 
 This implementation is a subject to change as it is very premature.
 """
+from __future__ import print_function
+from __future__ import print_function
 
 import re
 import cStringIO as sio
 import tokenize
+import six
 
 
 class ParseError(Exception):
@@ -112,18 +115,18 @@ class Parser(object):
 
     def expression(self, rbp=0):
         t = self.token
-        self.token = self.next()
+        self.token = six.advance_iterator(self)
         left = t.nud()
         while rbp < self.token.lbp:
             t = self.token
-            self.token = self.next()
+            self.token = six.advance_iterator(self)
             left = t.led(left)
         return left
 
     def advance(self, id=None):
         if id and self.token.id != id:
             raise ParseError("Expected '%r', got '%r'" % (id, self.token))
-        self.token = self.next()
+        self.token = six.advance_iterator(self)
 
     def gen_python_symbols(self, source):
         for id, value, begin, end in gen_python_tokens(source):
@@ -145,7 +148,7 @@ class Parser(object):
 
     def parse(self, source):
         self.next = self.gen_python_symbols(source).next
-        self.token = self.next()
+        self.token = six.advance_iterator(self)
         result = self.expression()
         if self.token.id != "(end)":
             raise ParseError("Expected end, got '%r'" % self.token)
@@ -555,7 +558,7 @@ class PyExprParser(Parser):
 
     def parse_bare_arglist(self, source):
         self.next = self.gen_python_symbols(source.strip()).next
-        self.token = self.next()
+        self.token = six.advance_iterator(self)
         arglist = self.token.argument_list()
         if self.token.id != "(end)":
             raise ParseError("Expected end, got '%r'" % self.token)
@@ -565,7 +568,7 @@ class PyExprParser(Parser):
 if __name__ == '__main__':
     import sys
     if len(sys.argv) < 2:
-        print "Usage: tdparser.py filename"
+        print("Usage: tdparser.py filename")
     parser = PyExprParser()
     res = parser.parse_bare_arglist(file(sys.argv[1]).read())
-    print res
+    print(res)

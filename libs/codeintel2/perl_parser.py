@@ -38,6 +38,7 @@
 #   Eric Promislow (EricP@ActiveState.com)
 
 """Perl parsing support for codeintel/perlcile.py"""
+from __future__ import print_function
 
 import copy
 import os.path
@@ -106,7 +107,7 @@ def memoize(function, limit=None):
     memoize_wrapper._memoize_list = list
     memoize_wrapper._memoize_limit = limit
     memoize_wrapper._memoize_origfunc = function
-    memoize_wrapper.func_name = function.func_name
+    memoize_wrapper.__name__ = function.__name__
     return memoize_wrapper
 
 
@@ -166,7 +167,7 @@ def re_sub(*args):
         end = time.time()
         delta = end-start
         if delta > 0.01:  # adjust as needed.
-            print delta, '\t', args
+            print(delta, '\t', args)
     else:
         retval = re.sub(*args)
     return retval

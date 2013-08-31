@@ -460,7 +460,7 @@ class Indexer(threading.Thread):
     - There is a potential race condition on request id generation
       if addRequest/stageRequest calls are made from multiple threads.
     """
-    MODE_DAEMON, MODE_ONE_SHOT = range(2)
+    MODE_DAEMON, MODE_ONE_SHOT = list(range(2))
     mode = MODE_DAEMON
 
     class StopIndexing(Exception):

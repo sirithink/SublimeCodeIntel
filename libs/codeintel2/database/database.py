@@ -357,7 +357,7 @@ class Database(object):
     # Possible return values from .upgrade_info().
     (UPGRADE_NOT_NECESSARY,
      UPGRADE_NOT_POSSIBLE,
-     UPGRADE_NECESSARY) = range(3)
+     UPGRADE_NECESSARY) = list(range(3))
 
     def __init__(self, mgr, base_dir=None, catalog_dirs=None,
                  event_reporter=None,
@@ -421,7 +421,7 @@ class Database(object):
         path = join(self.base_dir, "VERSION")
         try:
             fin = open(path, 'r')
-        except EnvironmentError, ex:
+        except EnvironmentError as ex:
             return None
         try:
             return fin.read().strip()
@@ -455,7 +455,7 @@ class Database(object):
                 subsystem of SublimeCodeIntel). Do NOT modify anything in here
                 unless you know what you are doing.
 
-                See http://github.com/SublimeCodeIntel/SublimeCodeIntel for details.
+                See http://github.com/Kronuz/SublimeCodeIntel for details.
             """))
             open(join(self.base_dir, "VERSION"), 'w').write(self.VERSION)
             config_file = join(self.base_dir, "config")
@@ -621,7 +621,7 @@ class Database(object):
         if self.event_reporter:
             try:
                 self.event_reporter(desc)
-            except Exception, ex:
+            except Exception as ex:
                 log.exception("error calling event reporter: %s", ex)
 
     def save(self):
@@ -981,7 +981,7 @@ class Database(object):
             cache_key = ext[1:]
             try:
                 blob.cache[cache_key] = self.load_pickle(blob_cache_file)
-            except (UnpicklingError, ImportError), ex:
+            except (UnpicklingError, ImportError) as ex:
                 log.warn("error unpickling `%s' (skipping): %s",
                          blob_cache_file, ex)
         return blob
@@ -1019,7 +1019,7 @@ class Database(object):
                       dirname(path)[len(self.base_dir)+1:])
             try:
                 os.makedirs(dirname(path))
-            except OSError, ex:
+            except OSError as ex:
                 log.warn("error creating `%s': %s", dirname(path), ex)
         log.debug("fs-write: '%s'", path[len(self.base_dir)+1:])
         fout = open(path, 'wb')

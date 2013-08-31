@@ -32,6 +32,7 @@ import traceback
 import uuid
 from . import controller
 from os.path import abspath, normcase, normpath
+from six.moves import filter
 
 log = logging.getLogger("codeintel.oop.driver")
 

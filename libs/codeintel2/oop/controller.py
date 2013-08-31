@@ -5,6 +5,8 @@ from codeintel2.common import EvalController
 import logging
 import cStringIO
 import pprint
+from six.moves import map
+from six.moves import zip
 
 log = logging.getLogger("codeintel.oop.controller")
 

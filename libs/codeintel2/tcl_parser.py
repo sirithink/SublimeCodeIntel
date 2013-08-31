@@ -38,6 +38,7 @@
 #   Eric Promislow (EricP@ActiveState.com)
 
 """Tcl parsing support for codeintel/tclcile.py"""
+from __future__ import print_function
 
 import string
 import sys
@@ -472,5 +473,5 @@ if __name__ == "__main__":
     tokenizer = tcl_lexer.TclLexer(sample_code)
     parser = Parser(tokenizer, "Tcl")
     tree = parser.parse()
-    print "Analyze the parse tree"
+    print("Analyze the parse tree")
     tree.dump()

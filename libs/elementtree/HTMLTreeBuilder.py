@@ -56,7 +56,7 @@ import sys
 import mimetools
 import StringIO
 
-import ElementTree
+from . import ElementTree
 
 AUTOCLOSE = "p", "li", "tr", "th", "td", "head", "body"
 IGNOREEND = "img", "hr", "meta", "link", "br"

@@ -67,6 +67,9 @@ a list of all useful attributes see
 Note: This module requires at least Python 2.5 to use
 `codecs.lookup(<encname>).name`.
 """
+from __future__ import print_function
+from six.moves import map
+from six.moves import zip
 
 _cmdln_doc = """Determine information about text files.
 """
@@ -1321,11 +1324,11 @@ class Accessor(object):
         head_bytes = self.head_bytes
         try:
             head_bytes.decode(encoding, 'strict')
-        except LookupError, ex:
+        except LookupError as ex:
             log.debug("encoding lookup error: %r", encoding)
             self._unsuccessful_encodings.add(encoding)
             return False
-        except UnicodeError, ex:
+        except UnicodeError as ex:
             # If the decode failed in the last few bytes, it might be
             # because a multi-surrogate was cutoff by the head. Ignore
             # the error here, if it is truly not of this encoding, the
@@ -1339,7 +1342,7 @@ class Accessor(object):
                 return False
         try:
             self.text = self.bytes.decode(encoding, 'strict')
-        except UnicodeError, ex:
+        except UnicodeError as ex:
             self._unsuccessful_encodings.add(encoding)
             return False
         self.encoding = encoding
@@ -1351,7 +1354,7 @@ class PathAccessor(Accessor):
     (READ_NONE,             # _file==None, file not opened yet
      READ_HEAD,             # _bytes==<head bytes>
      READ_TAIL,             # _bytes==<head>, _bytes_tail==<tail>
-     READ_ALL) = range(4)   # _bytes==<all>, _bytes_tail==None, _file closed
+     READ_ALL) = list(range(4))   # _bytes==<all>, _bytes_tail==None, _file closed
     _read_state = READ_NONE  # one of the READ_* states
     _file = None
     _bytes = None
@@ -1443,7 +1446,7 @@ class PathAccessor(Accessor):
 
             if self._read_state == self.READ_ALL:
                 self.close()
-        except Exception, ex:
+        except Exception as ex:
             log.warn("Could not read file: %r due to: %r", self.path, ex)
             raise
 
@@ -1656,7 +1659,7 @@ def _walk(top, topdown=True, onerror=None, follow_symlinks=False):
     # left to visit.  That logic is copied here.
     try:
         names = os.listdir(top)
-    except OSError, err:
+    except OSError as err:
         if onerror is not None:
             onerror(err)
         return
@@ -1981,11 +1984,11 @@ def main(argv):
             ti = textinfo_from_path(path, encoding=opts.encoding,
                                     follow_symlinks=opts.follow_symlinks,
                                     quick_determine_lang=opts.quick_determine_lang)
-        except OSError, ex:
+        except OSError as ex:
             log.error("%s: %s", path, ex)
             continue
         if opts.format == "summary":
-            print ti.as_summary()
+            print(ti.as_summary())
         elif opts.format == "dict":
             d = ti.as_dict()
             if "text" in d:
@@ -2011,7 +2014,7 @@ if __name__ == "__main__":
         exc_info = sys.exc_info()
         if log.isEnabledFor(logging.DEBUG):
             import traceback
-            print
+            print()
             traceback.print_exception(*exc_info)
         else:
             if hasattr(exc_info[0], "__name__"):

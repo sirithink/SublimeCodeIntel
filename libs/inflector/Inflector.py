@@ -6,8 +6,8 @@
 # (BSD-style).
 
 import re
-from Rules.English import English
-from Rules.Spanish import Spanish
+from .Rules.English import English
+from .Rules.Spanish import Spanish
 
 
 class Inflector:
