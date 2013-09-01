@@ -93,9 +93,7 @@ from functools import partial
 # to be returned from scan_et() by the clients of this module
 import ciElementTree as et
 
-import compiler
-from compiler import ast
-from compiler.visitor import dumpNode, ExampleASTVisitor
+import ast
 import parser
 
 from codeintel2.common import CILEError
@@ -1171,7 +1169,7 @@ class AST2CIXVisitor:
         elif isinstance(node, ast.Backquote):
             s = "`%s`" % self._getExprRepr(node.expr)
         elif isinstance(node, ast.Slice):
-            dumpNode(node)
+            ast.dump(node)
             s = self._getExprRepr(node.expr)
             s += "["
             if node.lower:
@@ -1344,7 +1342,7 @@ def _quietCompilerParse(content):
     oldstderr = sys.stderr
     sys.stderr = StringIO()
     try:
-        return compiler.parse(content)
+        return ast.parse(content)
     finally:
         sys.stderr = oldstderr
 
@@ -1364,7 +1362,7 @@ def _getAST(content):
     If cannot, raise an error describing the problem.
     """
     # EOL issues:
-    # compiler.parse() can't handle '\r\n' EOLs on Mac OS X and can't
+    # ast.parse() can't handle '\r\n' EOLs on Mac OS X and can't
     # handle '\r' EOLs on any platform. Let's just always normalize.
     # Unfortunately this is work only for the exceptional case. The
     # problem is most acute on the Mac.
@@ -1534,7 +1532,7 @@ def scan_cix(content, filename, md5sum=None, mtime=None, lang="Python"):
 
         "content" is the Python content to scan. This should be an
             encoded string: must be a string for `md5` and
-            `compiler.parse` -- see bug 73461.
+            `ast.parse` -- see bug 73461.
         "filename" is the source of the Python content (used in the
             generated output).
         "md5sum" (optional) if the MD5 hexdigest has already been calculated
@@ -1580,7 +1578,7 @@ def scan_et(content, filename, md5sum=None, mtime=None, lang="Python"):
 
         "content" is the Python content to scan. This should be an
             encoded string: must be a string for `md5` and
-            `compiler.parse` -- see bug 73461.
+            `ast.parse` -- see bug 73461.
         "filename" is the source of the Python content (used in the
             generated output).
         "md5sum" (optional) if the MD5 hexdigest has already been calculated
@@ -1604,7 +1602,7 @@ def scan_et(content, filename, md5sum=None, mtime=None, lang="Python"):
     """
     log.info("scan '%s'", filename)
     if md5sum is None:
-        md5sum = md5(content).hexdigest()
+        md5sum = md5(content.encode('utf-8')).hexdigest()
     if mtime is None:
         mtime = int(time.time())
 
@@ -1637,11 +1635,11 @@ def scan_et(content, filename, md5sum=None, mtime=None, lang="Python"):
         moduleName = os.path.splitext(os.path.basename(filename))[0]
         visitor = AST2CIXVisitor(moduleName, content=content, lang=lang)
         if log.isEnabledFor(logging.DEBUG):
-            walker = ExampleASTVisitor()
+            walker = ast.NodeVisitor()
             walker.VERBOSE = 1
         else:
             walker = None
-        compiler.walk(ast_, visitor, walker)
+        ast.walk(ast_, visitor, walker)
         if _gClockIt:
             sys.stdout.write(" (walk:%.3fs)" % (_gClock()-_gStartTime))
         if log.isEnabledFor(logging.INFO):
@@ -1663,6 +1661,7 @@ def scan_et(content, filename, md5sum=None, mtime=None, lang="Python"):
 
 #---- mainline
 def main(argv):
+    import time
     logging.basicConfig()
 
     # Parse options.
@@ -1704,7 +1703,6 @@ def main(argv):
             mtime = optarg
         elif opt in ("-c", "--clock"):
             _gClockIt = 1
-            import time
             global _gClock
             if sys.platform.startswith("win"):
                 _gClock = time.clock
