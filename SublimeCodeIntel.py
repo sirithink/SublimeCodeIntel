@@ -67,7 +67,7 @@ Configuration files (`~/.codeintel/config' or `project_root/.codeintel/config').
         }
     }
 """
-from __future__ import print_function
+
 
 VERSION = "2.0.2"
 
@@ -82,7 +82,7 @@ import sublime
 import sublime_plugin
 import threading
 import logging
-from cStringIO import StringIO
+from io import StringIO
 
 CODEINTEL_HOME_DIR = os.path.expanduser(os.path.join('~', '.codeintel'))
 __file__ = os.path.normpath(os.path.abspath(__file__))
@@ -249,7 +249,7 @@ def guess_lang(view=None, path=None):
     languages.setdefault(vid, {})
 
     lang = None
-    _codeintel_syntax_map = dict((k.lower(), v) for k, v in view.settings().get('codeintel_syntax_map', {}).items())
+    _codeintel_syntax_map = dict((k.lower(), v) for k, v in list(view.settings().get('codeintel_syntax_map', {}).items()))
     _lang = lang = syntax and _codeintel_syntax_map.get(syntax.lower(), syntax)
 
     folders = getattr(view.window(), 'folders', lambda: [])()  # FIXME: it's like this for backward compatibility (<= 2060)
@@ -471,7 +471,7 @@ def codeintel_callbacks(force=False):
     global _ci_next_savedb_, _ci_next_cullmem_
     __lock_.acquire()
     try:
-        views = QUEUE.values()
+        views = list(QUEUE.values())
         QUEUE.clear()
     finally:
         __lock_.release()
@@ -480,7 +480,7 @@ def codeintel_callbacks(force=False):
             callback(view, *args, **kwargs)
         sublime.set_timeout(_callback, 0)
     # saving and culling cached parts of the database:
-    for folders_id in _ci_mgr_.keys():
+    for folders_id in list(_ci_mgr_.keys()):
         mgr = codeintel_manager(folders_id)
         now = time.time()
         if now >= _ci_next_savedb_ or force:
@@ -653,14 +653,14 @@ def codeintel_scan(view, path, content, lang, callback=None, pos=None, forms=Non
             for conf in ['pythonExtraPaths', 'rubyExtraPaths', 'perlExtraPaths', 'javascriptExtraPaths', 'phpExtraPaths']:
                 v = [p.strip() for p in config.get(conf, []) + folders if p.strip()]
                 config[conf] = os.pathsep.join(set(p if p.startswith('/') else os.path.expanduser(p) if p.startswith('~') else os.path.abspath(os.path.join(project_base_dir, p)) if project_base_dir else p for p in v if p.strip()))
-            for conf, p in config.items():
-                if isinstance(p, basestring) and p.startswith('~'):
+            for conf, p in list(config.items()):
+                if isinstance(p, str) and p.startswith('~'):
                     config[conf] = os.path.expanduser(p)
 
             # Setup environment variables
             env = config.get('env', {})
             _environ = dict(os.environ)
-            for k, v in env.items():
+            for k, v in list(env.items()):
                 _old = None
                 while '$' in v and v != _old:
                     _old = v
@@ -835,7 +835,7 @@ def find_back(start_at, look_for):
 
 
 def updateCodeIntelDict(master, partial):
-    for key, value in partial.items():
+    for key, value in list(partial.items()):
         if isinstance(value, dict):
             master.setdefault(key, {}).update(value)
         elif isinstance(value, (list, tuple)):
@@ -878,13 +878,13 @@ def get_revision(path=None):
     while path and path != '/' and path != '\\':
         rev = _get_git_revision(path)
         if rev:
-            return u'GIT-%s' % rev
+            return 'GIT-%s' % rev
         uppath = os.path.abspath(os.path.join(path, '..'))
         if uppath != path:
             path = uppath
         else:
             break
-    return u'GIT-unknown'
+    return 'GIT-unknown'
 
 
 ALL_SETTINGS = [
@@ -998,7 +998,7 @@ class PythonCodeIntel(sublime_plugin.EventListener):
             despaired = True
             status_lock.acquire()
             try:
-                slns = [sid for sid, sln in status_lineno.items() if sln != rowcol[0]]
+                slns = [sid for sid, sln in list(status_lineno.items()) if sln != rowcol[0]]
             finally:
                 status_lock.release()
             for vid in slns:

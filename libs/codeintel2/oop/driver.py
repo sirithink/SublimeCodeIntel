@@ -117,7 +117,7 @@ class Driver(threading.Thread):
         self._builtin_commands = {}
         for attr in dir(self):
             # Note that we check startswith first to avoid getters etc.
-            if attr.startswith("do_") and callable(getattr(self, attr)):
+            if attr.startswith("do_") and isinstance(getattr(self, attr), collections.Callable):
                 command = attr[len("do_"):].replace("_", "-")
                 self._builtin_commands[command] = getattr(self, attr)
 
@@ -290,7 +290,7 @@ class Driver(threading.Thread):
     def report_error(self, message):
         self.send(request=None,
                   command="report-error",
-                  message=unicode(message))
+                  message=str(message))
 
     def start(self):
         """Start reading from the socket and dump requests into the queue"""
@@ -409,7 +409,7 @@ class CoreHandler(CommandHandler):
     def __init__(self):
         supportedCommands = set()
         for prop in dir(self):
-            if prop.startswith("do_") and callable(getattr(self, prop)):
+            if prop.startswith("do_") and isinstance(getattr(self, prop), collections.Callable):
                 supportedCommands.add(prop[len("do_"):].replace("_", "-"))
         self.supportedCommands = list(supportedCommands)
 
@@ -508,7 +508,7 @@ class CoreHandler(CommandHandler):
             try:
                 langs = request.languages
             except AttributeError:
-                langs = dict(zip(self._DEFAULT_LANGS, itertools.repeat(None)))
+                langs = dict(list(zip(self._DEFAULT_LANGS, itertools.repeat(None))))
             progress_base = 5
             progress_incr = (80 - progress_base) / len(
                 langs)  # stage 1 goes up to 80%
@@ -551,11 +551,11 @@ class CoreHandler(CommandHandler):
         elif typ == "citadel":
             driver.send(languages=driver.mgr.get_citadel_langs())
         elif typ == "xml":
-            driver.send(languages=filter(driver.mgr.is_xml_lang,
-                                         driver.mgr.buf_class_from_lang.keys()))
+            driver.send(languages=list(filter(driver.mgr.is_xml_lang,
+                                         list(driver.mgr.buf_class_from_lang.keys()))))
         elif typ == "multilang":
-            driver.send(languages=filter(driver.mgr.is_multilang,
-                                         driver.mgr.buf_class_from_lang.keys()))
+            driver.send(languages=list(filter(driver.mgr.is_multilang,
+                                         list(driver.mgr.buf_class_from_lang.keys()))))
         else:
             raise RequestFailure(message="Unknown language type %s" % (typ,))
 
@@ -607,7 +607,7 @@ class CoreHandler(CommandHandler):
         priority = request.get("priority", codeintel2.common.PRIORITY_CURRENT)
         mtime = request.get("mtime")
         if mtime is not None:
-            mtime = long(mtime)
+            mtime = int(mtime)
 
         def on_complete():
             driver.send(request=request)
@@ -695,7 +695,7 @@ class Request(dict):
 class Environment(codeintel2.environment.Environment):
     def __init__(self, request={}, send_fn=None, name=None):
         codeintel2.environment.Environment.__init__(self)
-        log_name = filter(None, [self.__class__.__name__, name])
+        log_name = [_f for _f in [self.__class__.__name__, name] if _f]
         self.log = log.getChild(".".join(log_name))
         self._env = dict(request.get("env", {}))
         self._prefs = [dict(level) for level in request.get("prefs", [])]
@@ -742,11 +742,11 @@ class Environment(codeintel2.environment.Environment):
         """
         changed_prefs = set()
         # All existing prefs will be removed
-        changed_prefs.update(*(level.keys() for level in self._prefs))
+        changed_prefs.update(*(list(level.keys()) for level in self._prefs))
         # Do the replacement (making a copy)
         self._prefs = [level.copy() for level in prefs]
         # All the new prefs are added
-        changed_prefs.update(*(level.keys() for level in self._prefs))
+        changed_prefs.update(*(list(level.keys()) for level in self._prefs))
         for pref in changed_prefs:
             self._notify_pref_observers(pref)
 
@@ -787,7 +787,7 @@ class Environment(codeintel2.environment.Environment):
     def remove_all_pref_observers(self):
         if self._send:
             self._send(command="global-prefs-observe",
-                       remove=self._observers.keys())
+                       remove=list(self._observers.keys()))
         self._observers.clear()
 
     def _notify_pref_observers(self, name):
@@ -802,7 +802,7 @@ class Environment(codeintel2.environment.Environment):
                 log.exception("error in pref observer for pref '%s' change",
                               name)
 
-    def __nonzero__(self):
+    def __bool__(self):
         """This is considered not-empty if it has anything in either the
         environment or preferences.
         """

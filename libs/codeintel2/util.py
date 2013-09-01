@@ -252,7 +252,7 @@ def parsePyFuncDoc(doc, fallbackCallSig=None, scope="?", funcname="?"):
         return ([], [])
 
     limit = LINE_LIMIT
-    if not isinstance(doc, unicode):
+    if not isinstance(doc, str):
         # try to convert from utf8 to unicode; if we fail, too bad.
         try:
             doc = codecs.utf_8_decode(doc)[0]
@@ -457,11 +457,11 @@ def lines_from_pos(unmarked_text, positions):
         offsets.append(offsets[-1] + len(line))
     try:
         # assume a dict
-        keys = positions.iterkeys()
+        keys = iter(positions.keys())
         values = {}
     except AttributeError:
         # assume a list/tuple
-        keys = range(len(positions))
+        keys = list(range(len(positions)))
         values = []
 
     for key in keys:
@@ -533,8 +533,8 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
     """
     DEBUG = False
     if DEBUG:
-        print "dedent: dedent(..., tabsize=%d, skip_first_line=%r)"\
-              % (tabsize, skip_first_line)
+        print("dedent: dedent(..., tabsize=%d, skip_first_line=%r)"\
+              % (tabsize, skip_first_line))
     indents = []
     margin = None
     for i, line in enumerate(lines):
@@ -553,13 +553,13 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
         else:
             continue  # skip all-whitespace lines
         if DEBUG:
-            print "dedent: indent=%d: %r" % (indent, line)
+            print("dedent: indent=%d: %r" % (indent, line))
         if margin is None:
             margin = indent
         else:
             margin = min(margin, indent)
     if DEBUG:
-        print "dedent: margin=%r" % margin
+        print("dedent: margin=%r" % margin)
 
     if margin is not None and margin > 0:
         for i, line in enumerate(lines):
@@ -573,7 +573,7 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
                     removed += tabsize - (removed % tabsize)
                 elif ch in '\r\n':
                     if DEBUG:
-                        print "dedent: %r: EOL -> strip up to EOL" % line
+                        print("dedent: %r: EOL -> strip up to EOL" % line)
                     lines[i] = lines[i][j:]
                     break
                 else:
@@ -581,8 +581,8 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
                                      "line %r while removing %d-space margin"
                                      % (ch, line, margin))
                 if DEBUG:
-                    print "dedent: %r: %r -> removed %d/%d"\
-                          % (line, ch, removed, margin)
+                    print("dedent: %r: %r -> removed %d/%d"\
+                          % (line, ch, removed, margin))
                 if removed == margin:
                     lines[i] = lines[i][j+1:]
                     break
@@ -648,7 +648,7 @@ def walk2(top, topdown=True, onerror=None, followlinks=False,
         # Note that listdir and error are globals in this module due
         # to earlier import-*.
         names = os.listdir(top)
-    except os.error, err:
+    except os.error as err:
         if onerror is not None:
             onerror(err)
         return
@@ -660,7 +660,7 @@ def walk2(top, topdown=True, onerror=None, followlinks=False,
                 dirs.append(name)
             else:
                 nondirs.append(name)
-        except UnicodeDecodeError, err:
+        except UnicodeDecodeError as err:
             if ondecodeerror is not None:
                 ondecodeerror(err)
 
@@ -696,7 +696,7 @@ def timeit(func):
             return func(*args, **kw)
         finally:
             total_time = clock() - start_time
-            print "%s took %.3fs" % (func.func_name, total_time)
+            print("%s took %.3fs" % (func.__name__, total_time))
     return wrapper
 
 
@@ -704,7 +704,7 @@ def hotshotit(func):
     def wrapper(*args, **kw):
         import hotshot
         global hotshotProfilers
-        prof_name = func.func_name+".prof"
+        prof_name = func.__name__+".prof"
         profiler = hotshotProfilers.get(prof_name)
         if profiler is None:
             profiler = hotshot.Profile(prof_name)
@@ -787,7 +787,7 @@ def make_short_name_dict(names, length=3):
             else:
                 l.append(name)
         # pprint(outdict)
-    for values in outdict.values():
+    for values in list(outdict.values()):
         values.sort(CompareNPunctLast)
     return outdict
 

@@ -214,7 +214,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
         # javascript/cpln/ctor_scope_cheat for an example of why.
         try:
             elem = self._elem_from_scoperef(scoperef)
-        except KeyError, ex:
+        except KeyError as ex:
             self.warn("_hit_from_first_token:: no elem for scoperef: %r",
                       scoperef)
             return (None, None)
@@ -234,7 +234,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
         while 1:
             try:
                 elem = self._elem_from_scoperef(scoperef)
-            except KeyError, ex:
+            except KeyError as ex:
                 raise EvalError("could not resolve scoperef %r: %s"
                                 % (scoperef, ex))
             try:
@@ -427,13 +427,13 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                     if token == "()":
                         try:
                             new_hits += self._hits_from_call(elem, scoperef)
-                        except CodeIntelError, ex:
+                        except CodeIntelError as ex:
                             self.warn("could resolve call on %r: %s", elem, ex)
                     else:
                         try:
                             new_hit = self._hit_from_getattr(
                                 elem, scoperef, token)
-                        except CodeIntelError, ex:
+                        except CodeIntelError as ex:
                             self.warn(str(ex))
                         else:
                             new_hits.append(new_hit)
@@ -466,7 +466,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                         else:
                             subhits = self._hits_from_variable_type_inference(
                                 elem, scoperef)
-                    except CodeIntelError, ex:
+                    except CodeIntelError as ex:
                         self.warn("could not resolve %r: %s", elem, ex)
                     else:
                         resolved_hits += subhits
@@ -700,7 +700,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                      " expression found, trying alternatives.")
             try:
                 parent_elem = self._elem_from_scoperef(scoperef)
-            except KeyError, ex:
+            except KeyError as ex:
                 raise CodeIntelError(
                     "could not resolve recursive citdl expression %r" % citdl)
             else:
@@ -931,7 +931,7 @@ class JavaScriptTreeEvaluator(CandidatesForTreeEvaluator):
                 if name not in all_completions:
                     all_completions[name] = ilk
 
-        return [(ilk, name) for name, ilk in all_completions.items()]
+        return [(ilk, name) for name, ilk in list(all_completions.items())]
 
 
 #####################################
@@ -945,7 +945,7 @@ from ciElementTree import Element, SubElement, dump
 if _xpcom_:
     from xpcom import xpt
     _xpcom_ = True
-    from gencix_utils import *
+    from .gencix_utils import *
 
     # Dictionary of known xpcom types and what they map to in JavaScript
     javascript_type_from_xpt_tag = {
@@ -1011,7 +1011,7 @@ if _xpcom_:
         try:
             interface = xpt.Interface(iid)
         except:
-            print "No interface with iid: %r" % (iid, )
+            print("No interface with iid: %r" % (iid, ))
         else:
             # Filter out non-xpcom methods
             methods = [m for m in interface.methods if not m.IsNotXPCOM()]
@@ -1079,12 +1079,12 @@ def _add_xpcom_blob(built_in_blob):
                 _g_xpcom_components_elem.append(elem)
 
             # Add Components.interfaces data
-            for interface in components.interfaces.keys():
+            for interface in list(components.interfaces.keys()):
                 elem = SubElement(_g_xpcom_interfaces_elem, "scope",
                                   ilk="class", name=interface)
 
             # Add Components.classes data
-            for klass in components.classes.keys():
+            for klass in list(components.classes.keys()):
                 elem = SubElement(elem_classes, "variable", name=klass)
 
             # Add some common aliases
