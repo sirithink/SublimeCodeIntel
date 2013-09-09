@@ -359,8 +359,19 @@ _ci_next_cullmem_ = 0
 ################################################################################
 # Queue dispatcher system:
 
-queue_thread_name = "codeintel callbacks"
 MAX_DELAY = -1  # Does not apply
+queue_thread_name = "codeintel callbacks"
+
+
+def queue_dispatcher(force=False):
+    """
+    Default implementation of queue dispatcher (just clears the queue)
+    """
+    __lock_.acquire()
+    try:
+        QUEUE.clear()
+    finally:
+        __lock_.release()
 
 
 def queue_loop():
